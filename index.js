@@ -26,6 +26,14 @@ function getOperation() {
 
       if (action === "Criar Conta") {
         createAccount();
+      } else if (action === "Consultar Saldo") {
+      } else if (action === "Realizar Depósito") {
+      } else if (action === "Realizar Saque") {
+      } else {
+        if (action === "Finalizar Operações") {
+          console.log(chalk.bgYellow.black("Obrigado por usar o Accounts!"));
+          process.exit();
+        }
       }
     })
     .catch((err) => console.error(err));
@@ -83,4 +91,14 @@ function buildAccount() {
       getOperation();
     })
     .catch((err) => console.error(err));
+}
+
+function checkAccount(accountName) {
+  if (!fs.existsSync(`accounts/${accountName}.json`)) {
+    console.log(
+      chalk.bgRed.black("Essa conta não existe, escolha uma conta válida.")
+    );
+    return false;
+  }
+  return true;
 }
