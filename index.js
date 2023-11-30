@@ -28,6 +28,7 @@ function getOperation() {
         createAccount();
       } else if (action === "Consultar Saldo") {
       } else if (action === "Realizar Depósito") {
+        deposit();
       } else if (action === "Realizar Saque") {
       } else {
         if (action === "Finalizar Operações") {
@@ -100,5 +101,24 @@ function checkAccount(accountName) {
     );
     return false;
   }
+
   return true;
+}
+
+function deposit() {
+  inquirer
+    .prompt([
+      {
+        name: "accountName",
+        message: "Qual o nome da sua conta?",
+      },
+    ])
+    .then((answer) => {
+      const accountName = answer["accountName"];
+
+      if (!checkAccount(accountName)) {
+        return deposit();
+      }
+    })
+    .catch((err) => console.error(err));
 }
