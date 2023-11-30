@@ -28,7 +28,7 @@ function getOperation() {
         createAccount();
       } else if (action === "Consultar Saldo") {
       } else if (action === "Realizar Depósito") {
-        deposit();
+        createDeposit();
       } else if (action === "Realizar Saque") {
       } else {
         if (action === "Finalizar Operações") {
@@ -105,7 +105,7 @@ function checkAccount(accountName) {
   return true;
 }
 
-function deposit() {
+function createDeposit() {
   inquirer
     .prompt([
       {
@@ -117,8 +117,56 @@ function deposit() {
       const accountName = answer["accountName"];
 
       if (!checkAccount(accountName)) {
-        return deposit();
+        return createDeposit();
       }
+
+      inquirer
+        .prompt([
+          {
+            name: "amount",
+            message: "Quanto você deseja depositar?",
+          },
+        ])
+        .then((answer) => {
+          const amount = answer["amount"];
+
+          addAmount(accountName, amount);
+
+          getOperation();
+        })
+        .catch((err) => console.log(err));
     })
     .catch((err) => console.error(err));
+}
+
+function addAmount(accountName, amount) {
+  const accountData = getAccount(accountName);
+
+  if (!amount) {
+    console.log(chalk.bgRed.black("Erro ao realizar depósito."));
+    return createDeposit();
+  }
+
+  accountData.balance = parseFloat(amount) + parseFloat(accountData.balance);
+
+  fs.writeFileSync(
+    `accounts/${accountName}.json`,
+    JSON.stringify(accountData),
+    function (err) {
+      console.error(err);
+    }
+  );
+
+  console.log(
+    chalk.green(`Foi depositado o valor de R$ ${amount} na sua conta`)
+  );
+}
+
+function getAccount(accountName) {
+  const accountJSON = fs.readFileSync(`accounts/${accountName}.json`, {
+    encoding: "utf-8",
+    flag: "r",
+  });
+
+  return JSON.parse(accountJSON);
 }
