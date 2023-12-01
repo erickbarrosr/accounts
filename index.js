@@ -3,9 +3,9 @@ const fs = require("fs");
 const inquirer = require("inquirer");
 const chalk = require("chalk");
 
-getOperation();
+chooseOperation();
 
-function getOperation() {
+function chooseOperation() {
   inquirer
     .prompt([
       {
@@ -91,7 +91,7 @@ function buildAccount() {
 
       console.log(chalk.green("Parabéns, a sua conta foi criada!"));
 
-      getOperation();
+      chooseOperation();
     })
     .catch((err) => console.error(err));
 }
@@ -134,7 +134,7 @@ function makeDeposit() {
 
           addAmount(accountName, amount);
 
-          getOperation();
+          chooseOperation();
         })
         .catch((err) => console.log(err));
     })
@@ -196,7 +196,7 @@ function checkBalance() {
         )
       );
 
-      getOperation();
+      chooseOperation();
     })
     .catch((err) => console.error(err));
 }
@@ -226,11 +226,37 @@ function makeWithdraw() {
         .then((answer) => {
           const amount = answer["amount"];
 
-          console.log(amount);
-
-          getOperation();
+          removeAmount(accountName, amount);
         })
         .catch((err) => console.error(err));
     })
     .catch((err) => console.error(err));
+}
+
+function removeAmount(accountName, amount) {
+  const accountData = readAccountData(accountName);
+
+  if (!amount) {
+    console.log(chalk.bgRed.black("Erro no saque."));
+
+    return makeWithdraw();
+  }
+
+  if (accountData.balance < amount) {
+    console.log(chalk.bgRed.black(`Valor indisponível!`));
+
+    return makeWithdraw();
+  }
+
+  accountData.balance = parseFloat(accountData.balance) - parseFloat(amount);
+
+  fs.writeFileSync(
+    `accounts/${accountName}.json`,
+    JSON.stringify(accountData),
+    (err) => console.error(err)
+  );
+
+  console.log(chalk.green(`Saque no valor de R$ ${amount} realizado!`));
+
+  chooseOperation();
 }
