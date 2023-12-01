@@ -54,7 +54,7 @@ Exit: Allows users to exit the application.
 
 2. chalk: For styling the console output.
 
-## Contributing
+### Contributing
 
 Contributions are welcome! Feel free to submit issues or pull requests.
 
