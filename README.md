@@ -11,7 +11,7 @@ Make sure you have Node.js installed on your machine. You can download it from h
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/your-username/accounts-console-app.git
+git clone https://github.com/your-username/accounts.git
 ```
 
 2. Navigate to the project directory:
