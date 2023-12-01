@@ -27,10 +27,11 @@ function getOperation() {
       if (action === "Criar Conta") {
         createAccount();
       } else if (action === "Consultar Saldo") {
-        getAccountBalance();
+        checkBalance();
       } else if (action === "Realizar Depósito") {
-        createDeposit();
+        makeDeposit();
       } else if (action === "Realizar Saque") {
+        makeWithdraw();
       } else {
         if (action === "Finalizar Operações") {
           console.log(chalk.bgYellow.black("Obrigado por usar o Accounts!"));
@@ -106,7 +107,7 @@ function checkAccount(accountName) {
   return true;
 }
 
-function createDeposit() {
+function makeDeposit() {
   inquirer
     .prompt([
       {
@@ -118,7 +119,7 @@ function createDeposit() {
       const accountName = answer["accountName"];
 
       if (!checkAccount(accountName)) {
-        return createDeposit();
+        return makeDeposit();
       }
 
       inquirer
@@ -141,11 +142,11 @@ function createDeposit() {
 }
 
 function addAmount(accountName, amount) {
-  const accountData = getAccount(accountName);
+  const accountData = readAccountData(accountName);
 
   if (!amount) {
     console.log(chalk.bgRed.black("Erro ao realizar depósito."));
-    return createDeposit();
+    return makeDeposit();
   }
 
   accountData.balance = parseFloat(amount) + parseFloat(accountData.balance);
@@ -163,7 +164,7 @@ function addAmount(accountName, amount) {
   );
 }
 
-function getAccount(accountName) {
+function readAccountData(accountName) {
   const accountJSON = fs.readFileSync(`accounts/${accountName}.json`, {
     encoding: "utf-8",
     flag: "r",
@@ -172,7 +173,7 @@ function getAccount(accountName) {
   return JSON.parse(accountJSON);
 }
 
-function getAccountBalance() {
+function checkBalance() {
   inquirer
     .prompt([
       {
@@ -184,10 +185,10 @@ function getAccountBalance() {
       const accountName = answer["accountName"];
 
       if (!checkAccount(accountName)) {
-        return getAccountBalance();
+        return checkBalance();
       }
 
-      const accountData = getAccount(accountName);
+      const accountData = readAccountData(accountName);
 
       console.log(
         chalk.bgBlue.black(
@@ -196,6 +197,40 @@ function getAccountBalance() {
       );
 
       getOperation();
+    })
+    .catch((err) => console.error(err));
+}
+
+function makeWithdraw() {
+  inquirer
+    .prompt([
+      {
+        name: "accountName",
+        message: "Qual o nome da sua conta?",
+      },
+    ])
+    .then((answer) => {
+      const accountName = answer["accountName"];
+
+      if (!checkAccount(accountName)) {
+        return makeWithdraw();
+      }
+
+      inquirer
+        .prompt([
+          {
+            name: "amount",
+            message: "Quanto você deseja sacar?",
+          },
+        ])
+        .then((answer) => {
+          const amount = answer["amount"];
+
+          console.log(amount);
+
+          getOperation();
+        })
+        .catch((err) => console.error(err));
     })
     .catch((err) => console.error(err));
 }
